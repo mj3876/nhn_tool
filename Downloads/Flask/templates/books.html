@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독서 메모</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📚 독서 메모</h1>
+        
+        <div class="nav">
+            <a href="{{ url_for('index') }}" class="nav-btn">🏠 홈</a>
+            <a href="{{ url_for('books_add') }}" class="nav-btn">➕ 새 책 추가</a>
+        </div>
+        
+        {% if books %}
+        <div class="grid">
+            {% for book in books %}
+            <div class="card">
+                <div class="card-title">📖 {{ book.title }}</div>
+                <div class="card-meta">
+                    저자: {{ book.author }}<br>
+                    상태: 
+                    {% if book.status == 'reading' %}📗 읽는 중
+                    {% elif book.status == 'completed' %}✅ 완독
+                    {% else %}📕 읽을 예정
+                    {% endif %}
+                    <br>
+                    평점: 
+                    {% for i in range(book.rating|int) %}⭐{% endfor %}
+                </div>
+                <div class="card-content">
+                    {{ book.memo[:100] }}...
+                </div>
+                <div style="margin-top: 15px;">
+                    <a href="{{ url_for('books_delete', book_id=book.id) }}" 
+                       class="btn btn-danger"
+                       onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 50px; color: #999;">
+            아직 등록된 책이 없습니다.
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

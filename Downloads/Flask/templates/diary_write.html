@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일상 기록 작성</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>✍️ 오늘의 일상 기록</h1>
+        
+        <div class="nav">
+            <a href="{{ url_for('diary') }}" class="nav-btn">← 목록으로</a>
+        </div>
+        
+        <form method="POST" style="max-width: 700px; margin: 0 auto;">
+            <div class="form-group">
+                <label for="date">날짜</label>
+                <input type="date" id="date" name="date" required value="{{ today }}">
+            </div>
+            
+            <div class="form-group">
+                <label>오늘의 기분</label>
+                <div class="mood-selector">
+                    <span class="mood-option" onclick="selectMood('😊')" data-mood="😊">😊</span>
+                    <span class="mood-option" onclick="selectMood('😢')" data-mood="😢">😢</span>
+                    <span class="mood-option" onclick="selectMood('😡')" data-mood="😡">😡</span>
+                    <span class="mood-option" onclick="selectMood('😴')" data-mood="😴">😴</span>
+                    <span class="mood-option" onclick="selectMood('🤗')" data-mood="🤗">🤗</span>
+                    <span class="mood-option" onclick="selectMood('😰')" data-mood="😰">😰</span>
+                </div>
+                <input type="hidden" id="mood" name="mood" value="😊" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="hard_thing">오늘 힘들었던 일</label>
+                <textarea id="hard_thing" name="hard_thing" placeholder="힘들었던 일을 적어보세요..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="good_thing">오늘 좋았던 일</label>
+                <textarea id="good_thing" name="good_thing" placeholder="좋았던 일을 적어보세요..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="content">오늘의 이야기</label>
+                <textarea id="content" name="content" placeholder="오늘 하루를 자유롭게 기록해보세요..." style="min-height: 200px;"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1em;">
+                💾 저장하기
+            </button>
+        </form>
+    </div>
+    
+    <script>
+        // 기본 날짜를 오늘로 설정
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        
+        function selectMood(mood) {
+            document.getElementById('mood').value = mood;
+            
+            // 모든 선택 해제
+            document.querySelectorAll('.mood-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // 선택된 것만 표시
+            event.target.classList.add('selected');
+        }
+        
+        // 첫 번째 기분 기본 선택
+        document.querySelector('.mood-option').classList.add('selected');
+    </script>
+</body>
+</html>

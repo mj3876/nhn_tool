@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일상 기록</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📔 일상 기록</h1>
+        
+        <div class="nav">
+            <a href="{{ url_for('index') }}" class="nav-btn">🏠 홈</a>
+            <a href="{{ url_for('diary_write') }}" class="nav-btn">✍️ 새 기록 작성</a>
+        </div>
+        
+        {% if diaries %}
+        <div class="grid">
+            {% for diary in diaries %}
+            <div class="card">
+                <div class="card-title">
+                    <span style="font-size: 1.5em;">{{ diary.mood }}</span>
+                    {{ diary.date }}
+                </div>
+                <div class="card-meta">
+                    작성일: {{ diary.created_at }}
+                </div>
+                <div class="card-content">
+                    <p><strong>힘들었던 일:</strong> {{ diary.hard_thing[:50] }}...</p>
+                    <p><strong>좋았던 일:</strong> {{ diary.good_thing[:50] }}...</p>
+                </div>
+                <div style="margin-top: 15px;">
+                    <a href="{{ url_for('diary_view', diary_id=diary.id) }}" class="btn btn-primary">자세히 보기</a>
+                    <a href="{{ url_for('diary_delete', diary_id=diary.id) }}" 
+                       class="btn btn-danger"
+                       onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 50px; color: #999;">
+            아직 작성된 일상 기록이 없습니다.
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

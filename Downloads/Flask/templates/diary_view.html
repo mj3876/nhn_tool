@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일상 기록 보기</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        {% if diary %}
+        <h1>{{ diary.mood }} {{ diary.date }}의 기록</h1>
+        
+        <div class="nav">
+            <a href="{{ url_for('diary') }}" class="nav-btn">← 목록으로</a>
+        </div>
+        
+        <div style="max-width: 800px; margin: 30px auto;">
+            <div class="card">
+                <p style="color: #999; margin-bottom: 20px;">작성일: {{ diary.created_at }}</p>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #dc3545; margin-bottom: 10px;">😓 힘들었던 일</h3>
+                    <p style="line-height: 1.8; white-space: pre-wrap;">{{ diary.hard_thing }}</p>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #28a745; margin-bottom: 10px;">😊 좋았던 일</h3>
+                    <p style="line-height: 1.8; white-space: pre-wrap;">{{ diary.good_thing }}</p>
+                </div>
+                
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 10px;">📝 오늘의 이야기</h3>
+                    <p style="line-height: 1.8; white-space: pre-wrap;">{{ diary.content }}</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="{{ url_for('diary_delete', diary_id=diary.id) }}" 
+                    class="btn btn-danger"
+                    onclick="return confirm('정말 삭제하시겠습니까?')">
+                    🗑️ 삭제하기
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 50px; color: #999;">
+            <p>기록을 찾을 수 없습니다.</p>
+            <a href="{{ url_for('diary') }}" class="btn btn-primary" style="margin-top: 20px;">목록으로 돌아가기</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

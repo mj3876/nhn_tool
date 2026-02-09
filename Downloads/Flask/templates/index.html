@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 일상 관리</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 나의 일상 관리 시스템</h1>
+        
+        <div class="nav">
+            <a href="{{ url_for('diary') }}" class="nav-btn">📔 일상 기록</a>
+            <a href="{{ url_for('books') }}" class="nav-btn">📚 독서 메모</a>
+            <a href="{{ url_for('messages') }}" class="nav-btn">💬 응원 메시지</a>
+            <a href="{{ url_for('todos') }}" class="nav-btn">✅ 할일 목록</a>
+            <a href="{{ url_for('weather') }}" class="nav-btn">🌤️ 날씨</a>
+        </div>
+        
+        <div style="text-align: center; padding: 50px 0;">
+            <h2>오늘: {{ today }}</h2>
+            <p style="font-size: 1.2em; color: #666; margin-top: 20px;">
+                오늘도 좋은 하루 되세요! 😊
+            </p>
+            
+            <div id="random-message" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <button onclick="getRandomMessage()" class="btn btn-primary">
+                    랜덤 응원 메시지 보기
+                </button>
+                <p id="message-content" style="margin-top: 15px; font-size: 1.1em; color: #667eea;"></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function getRandomMessage() {
+            fetch('/messages/random')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('message-content').textContent = data.content;
+                });
+        }
+    </script>
+</body>
+</html>

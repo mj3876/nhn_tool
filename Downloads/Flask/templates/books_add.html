@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새 책 추가</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📚 새 책 추가하기</h1>
+        
+        <div class="nav">
+            <a href="{{ url_for('books') }}" class="nav-btn">← 목록으로</a>
+        </div>
+        
+        <form method="POST" style="max-width: 700px; margin: 0 auto;">
+            <div class="form-group">
+                <label for="title">책 제목</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="author">저자</label>
+                <input type="text" id="author" name="author" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="status">읽기 상태</label>
+                <select id="status" name="status" required>
+                    <option value="planned">읽을 예정</option>
+                    <option value="reading">읽는 중</option>
+                    <option value="completed">완독</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="rating">평점</label>
+                <select id="rating" name="rating" required>
+                    <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
+                    <option value="4">⭐⭐⭐⭐ (4점)</option>
+                    <option value="3" selected>⭐⭐⭐ (3점)</option>
+                    <option value="2">⭐⭐ (2점)</option>
+                    <option value="1">⭐ (1점)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="memo">독서 메모</label>
+                <textarea id="memo" name="memo" placeholder="인상 깊었던 구절, 느낀 점 등을 자유롭게 적어보세요..." style="min-height: 250px;" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1em;">
+                💾 저장하기
+            </button>
+        </form>
+    </div>
+</body>
+</html>

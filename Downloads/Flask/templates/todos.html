@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>할일 목록</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>✅ 할일 목록</h1>
+        
+        <div class="nav">
+            <a href="{{ url_for('index') }}" class="nav-btn">🏠 홈</a>
+        </div>
+        
+        <div style="max-width: 800px; margin: 30px auto;">
+            <!-- 알림 설정 안내 -->
+            <div id="notification-setup" style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none;">
+                <p style="margin: 0; color: #856404;">
+                    ⚠️ <strong>알림 권한이 필요합니다!</strong><br>
+                    알람 소리를 들으려면 아래 버튼을 클릭해서 알림 권한을 허용해주세요.
+                </p>
+                <button onclick="requestNotificationPermission()" class="btn btn-primary" style="margin-top: 10px;">
+                    🔔 알림 권한 허용하기
+                </button>
+            </div>
+            
+            <!-- 알림 상태 표시 -->
+            <div id="notification-status" style="background: #d4edda; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none;">
+                <p style="margin: 0; color: #155724;">
+                    ✅ 알림이 활성화되었습니다! 설정한 시간에 소리와 함께 알람이 울립니다.
+                </p>
+            </div>
+            
+            <form method="POST" action="{{ url_for('todos_add') }}" style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px; color: #667eea;">새 할일 추가</h3>
+                
+                <div class="form-group">
+                    <label for="title">할일</label>
+                    <input type="text" id="title" name="title" placeholder="무엇을 할까요?" required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="date">날짜</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time">시간 (알람)</label>
+                        <input type="time" id="time" name="time">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="type">유형</label>
+                    <select id="type" name="type" required>
+                        <option value="daily">하루 할일</option>
+                        <option value="monthly">한 달 할일</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                    ➕ 추가하기
+                </button>
+            </form>
+            
+            <h2>📋 할일 목록</h2>
+            
+            {% if todos %}
+            <div>
+                {% for todo in todos %}
+                <div class="todo-item {% if todo.completed %}completed{% endif %}">
+                    <div>
+                        <strong>{{ todo.title }}</strong><br>
+                        <small style="color: #999;">
+                            📅 {{ todo.date }} 
+                            {% if todo.time %}⏰ {{ todo.time }}{% endif %}
+                            <span style="background: {% if todo.type == 'daily' %}#28a745{% else %}#007bff{% endif %}; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.8em;">
+                                {{ '하루' if todo.type == 'daily' else '한달' }}
+                            </span>
+                        </small>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('todos_toggle', todo_id=todo.id) }}" class="btn btn-success">
+                            {% if todo.completed %}✓{% else %}○{% endif %}
+                        </a>
+                        <a href="{{ url_for('todos_delete', todo_id=todo.id) }}" 
+                           class="btn btn-danger"
+                           onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 50px; color: #999;">
+                아직 등록된 할일이 없습니다.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        // 기본 날짜를 오늘로 설정
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        
+        // 알람 소리 생성 (Web Audio API 사용)
+        let audioContext = null;
+        let alarmSound = null;
+        
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        // 알람 소리 재생
+        function playAlarmSound() {
+            initAudio();
+            
+            // 비프음 3번 재생
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800; // 주파수 (Hz)
+                    oscillator.type = 'sine'; // 소리 타입
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                }, i * 600);
+            }
+            
+            // 진동 (안드로이드 지원)
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200, 100, 200]);
+            }
+        }
+        
+        // 알림 권한 요청
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    updateNotificationStatus();
+                    if (permission === 'granted') {
+                        alert('알림 권한이 허용되었습니다! ✅');
+                    }
+                });
+            }
+        }
+        
+        // 알림 상태 업데이트
+        function updateNotificationStatus() {
+            const setupDiv = document.getElementById('notification-setup');
+            const statusDiv = document.getElementById('notification-status');
+            
+            if ('Notification' in window) {
+                if (Notification.permission === 'default') {
+                    setupDiv.style.display = 'block';
+                    statusDiv.style.display = 'none';
+                } else if (Notification.permission === 'granted') {
+                    setupDiv.style.display = 'none';
+                    statusDiv.style.display = 'block';
+                } else {
+                    setupDiv.style.display = 'none';
+                    statusDiv.style.display = 'none';
+                }
+            }
+        }
+        
+        // 할일 알람 확인
+        function checkTodoAlarms() {
+            fetch('/api/todos/today')
+                .then(response => response.json())
+                .then(todos => {
+                    const now = new Date();
+                    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    
+                    todos.forEach(todo => {
+                        if (todo.time === currentTime && !todo.completed) {
+                            // 알람 소리 재생
+                            playAlarmSound();
+                            
+                            // 브라우저 알림 표시
+                            if (Notification.permission === "granted") {
+                                const notification = new Notification('할일 알림 ⏰', {
+                                    body: todo.title,
+                                    icon: '/static/icon.png',
+                                    badge: '/static/badge.png',
+                                    vibrate: [200, 100, 200],
+                                    requireInteraction: true, // 사용자가 닫을 때까지 유지
+                                    tag: 'todo-' + todo.id // 중복 알림 방지
+                                });
+                                
+                                // 알림 클릭 시 할일 페이지로 이동
+                                notification.onclick = function() {
+                                    window.focus();
+                                    notification.close();
+                                };
+                            }
+                        }
+                    });
+                });
+        }
+        
+        // 페이지 로드 시 실행
+        window.addEventListener('load', function() {
+            updateNotificationStatus();
+            initAudio();
+            
+            // 초기 알람 확인
+            checkTodoAlarms();
+        });
+        
+        // 1분마다 알람 확인
+        setInterval(checkTodoAlarms, 60000);
+        
+        // 사용자 인터랙션 시 오디오 컨텍스트 활성화 (안드로이드 정책)
+        document.addEventListener('click', function() {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
