@@ -3,7 +3,7 @@ API 설정 파일
 """
 
 # 고속도로 휴게소 날씨 API 키
-WEATHER_API_KEY = "1663676750"
+WEATHER_API_KEY = ""
 
 # 고속도로 휴게소 날씨 API URL (HTTPS)
 WEATHER_API_URL = "https://data.ex.co.kr/openapi/restinfo/restWeatherList"
